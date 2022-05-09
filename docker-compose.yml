@@ -1,0 +1,59 @@
+version: '3.3'
+
+services:
+  mysql:
+    image: mysql:8.0.23
+    container_name: mysql_exchange_api
+    hostname: mysql_exchange_api
+    environment:
+      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db_root_password
+      - MYSQL_DATABASE=exchange_api
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD_FILE=/run/secrets/db_password
+    restart: unless-stopped
+    labels:
+      - traefik.enable=false
+    networks:
+      - default
+    ports:
+      - 127.0.0.1:33070:3306
+    volumes:
+      - mysql-data:/var/lib/mysql
+    secrets:
+      - db_root_password
+      - db_password
+  app:
+    build: .
+    container_name: app_exchange_api
+    hostname: app_exchange_api
+    restart: unless-stopped
+    links:
+      - mysql
+    external_links:
+      - traefik
+    networks:
+      - internal
+      - default
+    volumes:
+      - ./src:/var/www/html
+    depends_on:
+      - mysql
+    labels:
+      - "traefik.http.middlewares.sslredirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.exchange_api_secure.middlewares=sslredirect"
+      - "traefik.enable=true"
+      - "traefik.http.routers.exchange_api_secure.rule=Host(`exchange_api.docker.localhost`)"
+      - "traefik.http.routers.exchange_api_secure.entrypoints=websecure"
+      - "traefik.http.routers.exchange_api_secure.tls.certresolver=myresolver"
+      - "traefik.docker.network=internal"
+secrets:
+  db_root_password:
+    file: db_root_password.txt
+  db_password:
+    file: db_password.txt
+volumes:
+  mysql-data:
+networks:
+  default:
+  internal:
+    external: true
