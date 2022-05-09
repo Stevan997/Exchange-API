@@ -1,6 +1,7 @@
 <?php
 
-/** @var \Laravel\Lumen\Routing\Router $router */
+///** @var \Laravel\Lumen\Routing\Router $router */
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +14,10 @@
 |
 */
 
-$router->get('/', function () use ($router) {
-    return $router->app->version();
+Route::group(['prefix' => '/api'], function () {
+    Route::group(['prefix' => '/v1'], function () {
+
+    });
 });
+
+
