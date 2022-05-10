@@ -1,7 +1,6 @@
 <?php
 
-///** @var \Laravel\Lumen\Routing\Router $router */
-use Illuminate\Support\Facades\Route;
+/** @var Router $router */
 
 /*
 |--------------------------------------------------------------------------
@@ -14,10 +13,19 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::group(['prefix' => '/api'], function () {
-    Route::group(['prefix' => '/v1'], function () {
+use Laravel\Lumen\Routing\Router;
 
-    });
+$router->get('/', function () use ($router) {
+    return $router->app->version();
 });
 
-
+$router->group(['prefix' => '/api'], function () use ($router) {
+    $router->group(['prefix' => '/v1'], function () use ($router) {
+        $router->group(['prefix' => '/currencies'], function () use ($router) {
+            $router->get('/', 'CurrencyController@all');
+        });
+        $router->group(['prefix' => '/exchange'], function () use ($router) {
+            $router->get('/', 'ExchangeController@exchange');
+        });
+    });
+});

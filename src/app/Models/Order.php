@@ -2,17 +2,20 @@
 
 namespace App\Models;
 
-class Order
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class Order extends Model
 {
     /**
      * @var string
      */
-    protected $table = 'currency_values';
+    protected string $table = 'orders';
 
     /**
      * @var string[]
      */
-    protected $fillable = [
+    protected array $fillable = [
         'currency_value_id',
         'surcharge_percentage',
         'surcharge_amount',
@@ -21,4 +24,12 @@ class Order
         'discount_percentage',
         'discount_amount',
     ];
+
+    /**
+     * @return BelongsTo
+     */
+    public function currencyValue(): BelongsTo
+    {
+        return $this->belongsTo(CurrencyValue::class,'currency_value_id', 'id');
+    }
 }
