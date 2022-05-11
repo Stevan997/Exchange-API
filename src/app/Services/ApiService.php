@@ -33,7 +33,7 @@ class ApiService
                 'query' => [
                     'amount' => 1,
                     'to' => $currency,
-                    'from' => 'USD'
+                    'from' => $this->usd
                 ]
             ]);
             return (array)json_decode($res->getBody()->getContents());
