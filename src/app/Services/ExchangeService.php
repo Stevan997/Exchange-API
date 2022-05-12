@@ -28,11 +28,11 @@ class ExchangeService
             $calculatedValues = $this->calculate($amount, $currencyValue->value, $currency->surcharge_percentage);
             $orderArray = $this->parseOrderArray($currencyValue->id, $currency->surcharge_percentage, $calculatedValues, $amount, $currency->name);
             if ($request->get('ajax', false)) {
-                return ['status' => 'success', 'amount' => $amount, 'paid' => $orderArray['paid_amount'], 'discount' => $orderArray['discount_amount']];
+                return ['status' => 'success', 'amount' => $amount, 'paid' => round($orderArray['paid_amount'], 2), 'discount' => $orderArray['discount_amount']];
             }
             $id = $this->createOrder($orderArray);
             $this->additionalActions($currency->name, $id, $request->get('email'));
-            return ['status' => 'success', 'amount' => $amount, 'paid' => $orderArray['paid_amount'], 'discount' => $orderArray['discount_amount']];
+            return ['status' => 'success', 'amount' => $amount, 'paid' => round($orderArray['paid_amount'], 2), 'discount' => $orderArray['discount_amount']];
         } catch (\Exception $exception) {
             dd($exception->getMessage());
         }
@@ -55,7 +55,7 @@ class ExchangeService
      */
     private function calculate(float $amount, float $currencyPrice, float $surcharge): array
     {
-        $price = $amount * $currencyPrice;
+        $price = $amount / $currencyPrice;
         $surchargeAmount = ($surcharge / 100) * $price;
         return [
             'total' => $price + $surchargeAmount,
