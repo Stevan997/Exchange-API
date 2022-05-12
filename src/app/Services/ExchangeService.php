@@ -27,12 +27,13 @@ class ExchangeService
             $currencyValue = $currency->values()->latest()->first();
             $calculatedValues = $this->calculate($amount, $currencyValue->value, $currency->surcharge_percentage);
             $orderArray = $this->parseOrderArray($currencyValue->id, $currency->surcharge_percentage, $calculatedValues, $amount, $currency->name);
+            $returnArray = ['status' => 'success', 'amount' => $amount, 'paid' => round($orderArray['paid_amount'], 2), 'discount' => $orderArray['discount_amount'], 'currency' => $currency->name];
             if ($request->get('ajax', false)) {
-                return ['status' => 'success', 'amount' => $amount, 'paid' => round($orderArray['paid_amount'], 2), 'discount' => $orderArray['discount_amount']];
+                return $returnArray;
             }
             $id = $this->createOrder($orderArray);
             $this->additionalActions($currency->name, $id, $request->get('email'));
-            return ['status' => 'success', 'amount' => $amount, 'paid' => round($orderArray['paid_amount'], 2), 'discount' => $orderArray['discount_amount']];
+            return $returnArray;
         } catch (\Exception $exception) {
             dd($exception->getMessage());
         }
