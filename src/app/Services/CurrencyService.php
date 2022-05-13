@@ -11,17 +11,18 @@ use Illuminate\Support\Facades\Log;
 class CurrencyService extends ApiService
 {
     /**
-     * @param Request $request
      * @return Builder[]|Collection
      */
-    public function all(Request $request): Collection
+    public function all(): Collection
     {
-        return Currency::with('values')->get();
+        return Currency::with(['values' => function ($query) {
+            $query->latest();
+        }])->get();
     }
 
     public function sync()
     {
-        foreach ($this->getCurrencies() as $currency) {
+        foreach ($this->all() as $currency) {
             try {
                 $result = $this->getLiveCurrencyData($currency->name);
                 if($result['success']) {
@@ -31,16 +32,6 @@ class CurrencyService extends ApiService
                 Log::critical($exception->getMessage());
             }
         }
-    }
-
-    /**
-     * @return Currency[]|Collection
-     */
-    private function getCurrencies(): Collection
-    {
-        return Currency::with(['values' => function ($query) {
-            $query->latest();
-        }])->get();
     }
 
     /**

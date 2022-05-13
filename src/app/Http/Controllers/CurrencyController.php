@@ -22,6 +22,6 @@ class CurrencyController extends Controller
      */
     public function all(Request $request): JsonResponse
     {
-        return response()->json(['data' => $this->service->all($request), 'status' => 'ok']);
+        return response()->json(['data' => $this->service->all(), 'status' => 'ok']);
     }
 }

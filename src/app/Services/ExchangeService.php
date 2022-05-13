@@ -23,11 +23,14 @@ class ExchangeService
             if (is_null($amount) || is_null($currency)) {
                 return ['status' => 'fail', 'message' => 'There was a problem with request, please try again'];
             }
+
             $currency = Currency::where('name', $currency)->first();
             $currencyValue = $currency->values()->latest()->first();
+
             $calculatedValues = $this->calculate($amount, $currencyValue->value, $currency->surcharge_percentage);
             $orderArray = $this->parseOrderArray($currencyValue->id, $currency->surcharge_percentage, $calculatedValues, $amount, $currency->name);
             $returnArray = ['status' => 'success', 'amount' => $amount, 'paid' => round($orderArray['paid_amount'], 2), 'discount' => $orderArray['discount_amount'], 'currency' => $currency->name];
+
             if ($request->get('ajax', false)) {
                 return $returnArray;
             }
@@ -35,7 +38,7 @@ class ExchangeService
             $this->additionalActions($currency->name, $id, $request->get('email'));
             return $returnArray;
         } catch (\Exception $exception) {
-            dd($exception->getMessage());
+            return ['status' => 'fail', 'message' => $exception->getMessage()];
         }
     }
 
