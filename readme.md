@@ -55,3 +55,5 @@ This will create a dockerized stack for a Laravel/Lumen application, consisted o
 5. Log in to docker instance with following command `docker exec -it app_exchange_api /bin/bash`
 
 6. Then run `composer install`
+
+7. If there are issues with permissions for storage files run `chmod 777 -R storage/` inside docker container
